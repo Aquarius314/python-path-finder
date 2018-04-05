@@ -10,6 +10,8 @@ class Algorithm:
     TILE_SIZE = 20
     path = []
 
+    last_step = []
+
     def __init__(self, width, height, screen):
         self.width = width
         self.height = height
