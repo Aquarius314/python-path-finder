@@ -8,6 +8,7 @@ class Gui:
     OBSTACLE_COLOR = (200, 0, 0)
     START_COLOR = (0, 200, 0)
     GOAL_COLOR = (0, 0, 200)
+    STEP_COLOR = (200, 200, 0)
 
     def __init__(self, width, height, screen):
         self.width = width
@@ -28,14 +29,19 @@ class Gui:
             for y in range(len(fields[0])):
                 if fields[x, y] == 1:
                     pygame.draw.rect(self.screen, self.OBSTACLE_COLOR,
-                                     pygame.Rect(x*tile+1, y*tile+1, tile-1, tile-1))
+                                     pygame.Rect(x*tile, y*tile, tile, tile))
 
     def _display_specific_field(self, position, color, tile):
         x, y = position
-        pygame.draw.circle(self.screen, color, (int(x*tile+tile/2), int(y*tile+tile/2)), int(tile/2))
+        pygame.draw.circle(self.screen, color, (int(x*tile+tile/2-2), int(y*tile+tile/2-2)), int(tile/2+2))
 
     def display_start(self, position, tile):
         self._display_specific_field(position, self.START_COLOR, tile)
 
     def display_goal(self, position, tile):
         self._display_specific_field(position, self.GOAL_COLOR, tile)
+
+    def display_step(self, position, tile):
+        x, y = position
+        pygame.draw.circle(self.screen, self.STEP_COLOR,
+                           (int(x*tile+tile/2), int(y*tile+tile/2)), int(tile/3))
