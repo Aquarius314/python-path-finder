@@ -19,6 +19,10 @@ class Algorithm:
         print("World dimensions set to", self.WORLD_WIDTH, self.WORLD_HEIGHT)
         self.world = World(self.WORLD_WIDTH, self.WORLD_HEIGHT)
         self.iterations = 0
+        self.setup()
+
+    def setup(self):
+        pass
 
     def run(self):
         self.iterations += 1
@@ -28,10 +32,14 @@ class Algorithm:
             return False
 
         # algo guts here
+        self.calculate()
 
         self.update_gui()
         time.sleep(0.1)
         return True
+
+    def calculate(self):
+        pass
 
     def update_gui(self):
         # self.gui.display_grid(self.WORLD_WIDTH, self.WORLD_HEIGHT, self.TILE_SIZE)
