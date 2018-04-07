@@ -19,6 +19,12 @@ class Algorithm:
 
     ENABLE_CORNER_NEIGHBOURS = False
 
+    # tmp
+    RED = 255
+    GREEN = 0
+    BLUE = 1
+    COLOR_ITERATIONS = 0
+
     goal_reached = False
     last_steps = []
     current_iteration_steps = []
@@ -80,7 +86,7 @@ class Algorithm:
         self.last_steps.clear()
         position = self.world.get_goal_position()
         while True:
-            new_position = self.get_smallest_neighbour(position)
+            new_position = self.get_smaller_neighbour(position)
             self.last_steps.append(new_position)
             x, y = new_position
             start_x, start_y = self.world.get_start_position()
@@ -99,6 +105,26 @@ class Algorithm:
                         smallest = self.steps[a, b]
                         smallest_position = a, b
         return smallest_position
+
+    def find_differenced_neighbour(self, difference, current_value, position):
+        x, y = position
+        for a in range(x-1, x+2):
+            for b in range(y-1, y+2):
+                if (a != x or b != y) and 0 <= a < len(self.steps) and 0 <= b < len(self.steps[0]):
+                    neighbour_value = self.steps[a, b]
+                    if neighbour_value + difference == current_value:
+                        return a, b
+        return -1, -1
+
+    def get_smaller_neighbour(self, position):
+        x, y = position
+        current_value = self.steps[x, y]
+
+        a, b = self.find_differenced_neighbour(2, current_value, (x, y))
+        if a != -1:
+            return a, b
+        a, b = self.find_differenced_neighbour(1, current_value, (x, y))
+        return a, b
 
     def _propagate_step(self, step):
         x, y = step
@@ -120,22 +146,42 @@ class Algorithm:
                 self.steps[x, y] = distance + 1
                 self.current_iteration_steps.append((x, y))
             elif self.steps[x, y] == -2:
+                self.steps[x, y] = distance + 1
                 self.goal_reached = True
 
     def update_gui(self):
         # self.gui.clear()
-        # self.gui.display_grid(self.WORLD_WIDTH, self.WORLD_HEIGHT, self.TILE_SIZE)
-        self.gui.display_fields(self.world.get_fields(), self.TILE_SIZE)
+        # self.gui.display_fields(self.world.get_fields(), self.TILE_SIZE, self.WORLD_WIDTH, self.WORLD_HEIGHT)
         self.gui.display_start(self.world.get_start_position(), self.TILE_SIZE)
         self.gui.display_goal(self.world.get_goal_position(), self.TILE_SIZE)
         self.display_last_steps()
         # self.display_all_steps()
 
+    def _switch_colors(self, mode):
+        if mode == 0:
+            self.BLUE += 1
+        elif mode == 1:
+            self.RED -= 1
+        elif mode == 2:
+            self.GREEN += 1
+        elif mode == 3:
+            self.BLUE -= 1
+        elif mode == 4:
+            self.RED += 1
+        elif mode == 5:
+            self.GREEN -= 1
+
     def display_last_steps(self):
-        print("LAST STEPS:", len(self.last_steps))
+
+        self.COLOR_ITERATIONS += 1
+        color_mode = int((self.COLOR_ITERATIONS/255)) % 6
+        self._switch_colors(color_mode)
+
+        color = int(self.RED), int(self.GREEN), int(self.BLUE)
+        print(color)
         for step in self.last_steps:
             x, y = step
-            self.gui.display_step((x, y), self.TILE_SIZE)
+            self.gui.display_step((x, y), self.TILE_SIZE, color)
 
     def display_all_steps(self):
         for y in range(len(self.steps)):
