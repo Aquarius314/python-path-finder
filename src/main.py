@@ -1,10 +1,12 @@
 from algorithm import Algorithm
 import pygame
+import time
 
 
 print("PATHFINDER")
 
-width, height = 1000, 1000
+width, height = 700, 700
+initial_delay = 0
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -13,6 +15,8 @@ pygame.display.set_caption("PATHFINDER")
 algorithm = Algorithm(width, height, screen)
 print("RUNNING")
 running = True
+if initial_delay != 0:
+    time.sleep(initial_delay)
 while running:
     running = algorithm.run()
     disrupted = False
