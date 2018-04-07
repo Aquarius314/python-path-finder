@@ -5,7 +5,9 @@ import time
 import math
 
 
-class Algorithm:
+class BestFirstSearch:
+
+    # BEST FIRST SEARCH ALGORITHM
 
     MAX_ITERATIONS = 100000
     TILE_SIZE = 6
@@ -17,14 +19,11 @@ class Algorithm:
     head = 0, 0
     reached_goal = False
 
-    def __init__(self, width, height, screen):
+    def __init__(self, width, height, world, gui):
         self.width = width
         self.height = height
-        self.gui = Gui(width, height, screen)
-        self.WORLD_WIDTH = int(width / self.TILE_SIZE)
-        self.WORLD_HEIGHT = int(height / self.TILE_SIZE)
-        print("World dimensions set to", self.WORLD_WIDTH, self.WORLD_HEIGHT)
-        self.world = World(self.WORLD_WIDTH, self.WORLD_HEIGHT)
+        self.world = world
+        self.gui = gui
         self.iterations = 0
         self.setup()
 
@@ -67,7 +66,7 @@ class Algorithm:
                 self._check_for_shorter_path()
             self.RETURNS = 0
 
-        if self.RETURNS > 0:
+        if self.RETURNS > 0 and len(self.path) > 2:
             self.head = self.path[-2]
             self.path = self.path[:-1]
 
@@ -105,7 +104,7 @@ class Algorithm:
         return best_x, best_y
 
     def _is_in_dimensions(self, a, b):
-        return 0 <= a < self.WORLD_WIDTH and 0 <= b < self.WORLD_HEIGHT
+        return 0 <= a < self.world.get_width() and 0 <= b < self.world.get_height()
 
     def _is_not_in_obstacle(self, a, b):
         return self.world.get_fields()[a, b] != 1
@@ -118,9 +117,9 @@ class Algorithm:
 
     def update_gui(self):
         self.gui.clear()
-        self.gui.display_fields(self.world.get_fields(), self.TILE_SIZE, self.WORLD_WIDTH, self.WORLD_HEIGHT)
-        self.gui.display_start(self.world.get_start_position(), self.TILE_SIZE)
-        self.gui.display_goal(self.world.get_goal_position(), self.TILE_SIZE)
-        self.gui.display_path(self.checked, (100, 100, 100), self.TILE_SIZE)
-        self.gui.display_path(self.path, (200, 200, 0), self.TILE_SIZE)
+        self.gui.display_fields(self.world.get_fields(), self.world.get_width(), self.world.get_height())
+        self.gui.display_start(self.world.get_start_position())
+        self.gui.display_goal(self.world.get_goal_position())
+        self.gui.display_path(self.checked, (100, 100, 100))
+        self.gui.display_path(self.path, (200, 200, 0))
         return

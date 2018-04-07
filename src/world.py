@@ -4,7 +4,7 @@ import random
 
 class World:
 
-    OBSTACLES_PERCENTAGE = 35
+    OBSTACLES_PERCENTAGE = 25
 
     def __init__(self, width, height):
         self.width = width
@@ -20,8 +20,11 @@ class World:
         self._fields[self.start_x, self.start_y] = 0
 
     def _set_random_goal(self):
-        self.goal_x = random.randint(0, self.width-1)
-        self.goal_y = random.randint(0, self.height-1)
+        self.goal_x = random.randint(4, self.width-4)
+        self.goal_y = random.randint(4, self.height-4)
+        for a in range(-2, 3):
+            for b in range(-2, 3):
+                self._fields[self.goal_x+a, self.goal_y+b] = 0
 
     def _generate_random_obstacles(self):
         for x in range(self.width):
@@ -37,3 +40,15 @@ class World:
 
     def get_fields(self):
         return self._fields
+
+    def get_field_value(self, x, y):
+        return self._fields[x, y]
+
+    def get_width(self):
+        return self.width
+
+    def get_height(self):
+        return self.height
+
+    def get_size(self):
+        return self.width, self.height

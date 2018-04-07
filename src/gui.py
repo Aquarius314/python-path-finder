@@ -10,40 +10,41 @@ class Gui:
     GOAL_COLOR = (0, 0, 200)
     STEP_COLOR = (200, 200, 0)
 
-    def __init__(self, width, height, screen):
+    def __init__(self, width, height, screen, tile_size):
         self.width = width
         self.height = height
         self.screen = screen
+        self.tile = tile_size
 
     def clear(self):
         self.screen.fill(self.BACKGROUND_COLOR)
 
-    def display_fields(self, fields, tile, width, height):
+    def display_fields(self, fields, width, height):
         for x in range(width):
             for y in range(height):
                 if fields[x, y] == 1:
                     pygame.draw.rect(self.screen, self.OBSTACLE_COLOR,
-                                     pygame.Rect((x+1)*tile, (y+1)*tile, tile, tile))
+                                     pygame.Rect((x+1)*self.tile, (y+1)*self.tile, self.tile, self.tile))
 
-    def _display_specific_field(self, position, color, tile, size=0):
+    def _display_specific_field(self, position, color):
         x, y = position
         pygame.draw.rect(self.screen, color,
-                         pygame.Rect(x*tile+tile-size, y*tile+tile-size, tile+size*2, tile+size*2))
+                         pygame.Rect(x*self.tile+self.tile, y*self.tile+self.tile, self.tile, self.tile))
 
-    def display_start(self, position, tile):
-        self._display_specific_field(position, self.START_COLOR, tile, 2)
+    def display_start(self, position):
+        self._display_specific_field(position, self.START_COLOR)
 
-    def display_goal(self, position, tile):
-        self._display_specific_field(position, self.GOAL_COLOR, tile, 2)
+    def display_goal(self, position):
+        self._display_specific_field(position, self.GOAL_COLOR)
 
-    def display_step(self, position, tile, color):
+    def display_step(self, position, color):
         x, y = position
         pygame.draw.rect(self.screen, color,
-                         pygame.Rect(x*tile+tile, y*tile+tile, tile, tile))
+                         pygame.Rect(x*self.tile+self.tile, y*self.tile+self.tile, self.tile, self.tile))
 
-    def display_path(self, path, color, tile):
+    def display_path(self, path, color):
         for i in range(len(path)-1):
             position = path[i]
-            self._display_specific_field(position, color, tile)
+            self._display_specific_field(position, color)
 
-        self._display_specific_field(path[-1], (0, 220, 0), tile)
+        self._display_specific_field(path[-1], (0, 220, 0))
