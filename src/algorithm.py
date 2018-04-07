@@ -8,11 +8,12 @@ import math
 class Algorithm:
 
     MAX_ITERATIONS = 100000
-    TILE_SIZE = 2
+    TILE_SIZE = 6
     path = []
+    checked = []
 
     RETURNS = 0
-
+    delay = 0.0
     head = 0, 0
     reached_goal = False
 
@@ -42,7 +43,8 @@ class Algorithm:
             self.calculate()
 
         self.update_gui()
-        time.sleep(0.1)
+        if self.delay != 0:
+            time.sleep(self.delay)
         return True
 
     def calculate(self):
@@ -60,10 +62,30 @@ class Algorithm:
             self.RETURNS += 1
         else:
             self.path.append(self.head)
+            self.checked.append(self.head)
+            if len(self.path) > 3:
+                self._check_for_shorter_path()
             self.RETURNS = 0
 
         if self.RETURNS > 0:
-            self.head = self.path[-(1+self.RETURNS)]
+            self.head = self.path[-2]
+            self.path = self.path[:-1]
+
+    def _check_for_shorter_path(self):
+        last_position = self.path[-1]
+        for i in range(len(self.path)-2):
+            position = self.path[i]
+            if self._is_neighbour(last_position, position):
+                self.path = self.path[:i+1]
+                self.path.append(last_position)
+                return
+
+    def _is_neighbour(self, position_a, position_b):
+        ax, ay = position_a
+        bx, by = position_b
+        dif_x = math.fabs(ax-bx)
+        dif_y = math.fabs(ay-by)
+        return dif_x <= 1 and dif_y <= 1 and self._is_at_cross(ax, ay, bx, by)
 
     def _find_best_neighbour(self, position):
         x, y = position
@@ -77,7 +99,7 @@ class Algorithm:
                         if self._is_at_cross(a, b, x, y):
                             current_distance = self.distance(a, b, goal_x, goal_y)
                             if current_distance < best_distance:
-                                if (a, b) not in self.path:
+                                if (a, b) not in self.checked:
                                     best_distance = current_distance
                                     best_x, best_y = a, b
         return best_x, best_y
@@ -95,8 +117,10 @@ class Algorithm:
         return math.sqrt((x1-x2)**2 + (y1-y2)**2)
 
     def update_gui(self):
-        # self.gui.display_grid(self.WORLD_WIDTH, self.WORLD_HEIGHT, self.TILE_SIZE)
-        self.gui.display_fields(self.world.get_fields(), self.TILE_SIZE)
+        self.gui.clear()
+        self.gui.display_fields(self.world.get_fields(), self.TILE_SIZE, self.WORLD_WIDTH, self.WORLD_HEIGHT)
         self.gui.display_start(self.world.get_start_position(), self.TILE_SIZE)
         self.gui.display_goal(self.world.get_goal_position(), self.TILE_SIZE)
-        self.gui.display_path(self.path, self.TILE_SIZE)
+        self.gui.display_path(self.checked, (100, 100, 100), self.TILE_SIZE)
+        self.gui.display_path(self.path, (200, 200, 0), self.TILE_SIZE)
+        return

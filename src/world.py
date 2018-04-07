@@ -4,7 +4,7 @@ import random
 
 class World:
 
-    OBSTACLES_PERCENTAGE = 20
+    OBSTACLES_PERCENTAGE = 35
 
     def __init__(self, width, height):
         self.width = width
@@ -15,8 +15,8 @@ class World:
         self._set_start_position()
 
     def _set_start_position(self):
-        self.start_x = 1
-        self.start_y = 1
+        self.start_x = int(self.width/2)
+        self.start_y = int(self.height/2)
         self._fields[self.start_x, self.start_y] = 0
 
     def _set_random_goal(self):
