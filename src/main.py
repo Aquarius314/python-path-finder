@@ -4,7 +4,7 @@ import pygame
 
 print("PATHFINDER")
 
-width, height = 600, 600
+width, height = 800, 800
 
 pygame.init()
 clock = pygame.time.Clock()

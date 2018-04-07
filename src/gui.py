@@ -8,6 +8,7 @@ class Gui:
     OBSTACLE_COLOR = (200, 0, 0)
     START_COLOR = (0, 200, 0)
     GOAL_COLOR = (0, 0, 200)
+    STEP_COLOR = (200, 200, 0)
 
     def __init__(self, width, height, screen):
         self.width = width
@@ -39,3 +40,10 @@ class Gui:
 
     def display_goal(self, position, tile):
         self._display_specific_field(position, self.GOAL_COLOR, tile)
+
+    def display_path(self, path, tile):
+        for i in range(len(path)-1):
+            position = path[i]
+            self._display_specific_field(position, self.STEP_COLOR, tile)
+
+        self._display_specific_field(path[-1], (100, 100, 100), tile)
