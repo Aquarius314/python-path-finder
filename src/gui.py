@@ -19,12 +19,12 @@ class Gui:
     def clear(self):
         self.screen.fill(self.BACKGROUND_COLOR)
 
-    def display_fields(self, fields, width, height):
-        for x in range(width):
-            for y in range(height):
-                if fields[x, y] == 1:
-                    pygame.draw.rect(self.screen, self.OBSTACLE_COLOR,
-                                     pygame.Rect((x+1)*self.tile, (y+1)*self.tile, self.tile, self.tile))
+    def display_fields(self, walls, width, height):
+        for wall in walls:
+            pygame.draw.rect(self.screen, self.OBSTACLE_COLOR,
+                    pygame.Rect((wall.x + 1) * self.tile, (wall.y + 1) * self.tile,
+                                (wall.width) * self.tile, (wall.height) * self.tile))
+
 
     def _display_specific_field(self, position, color):
         x, y = position
@@ -47,4 +47,5 @@ class Gui:
             position = path[i]
             self._display_specific_field(position, color)
 
-        self._display_specific_field(path[-1], (0, 220, 0))
+        if len(path) > 0:
+            self._display_specific_field(path[-1], (0, 220, 0))

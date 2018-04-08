@@ -7,12 +7,14 @@ import numpy as np
 
 class WavePropagation:
 
-    # WAVE PROPAGATION ALGORITHM
+    NAME = "Wave Propagation"
     # -1: obstacle, -2: goal, any other: number of steps to get there (counting start as 1)
 
     MAX_ITERATIONS = 100000
+    COST = 0
     TILE_SIZE = 5
     delay = 0.0
+    freeze = False
     path = []
 
     steps = []
@@ -54,19 +56,24 @@ class WavePropagation:
         self.steps[goal_x, goal_y] = -2
 
     def run(self):
-        self.iterations += 1
-        if self.iterations%10 == 0:
-            print("WP running iteration nr", self.iterations)
-        if self.iterations >= self.MAX_ITERATIONS:
-            return False
+        if not self.freeze:
+            if self.goal_reached:
+                path_length = 0
+                for l in self.path:
+                    path_length += 1
+                print("WP Path found, length:", str(path_length), ", iters:", self.iterations, ", cost:", self.COST)
+                self.freeze = True
+            else:
+                self.iterations += 1
 
-        # algo guts here
-        self.calculate()
+            # algo guts here
+            self.calculate()
 
         self.update_gui()
         if self.delay != 0:
             time.sleep(self.delay)
-        return True
+        else:
+            return True
 
     def calculate(self):
         self.current_iteration_steps.clear()
@@ -75,11 +82,11 @@ class WavePropagation:
         else:
             # mark neighbour fields with distance+1
             for step in self.last_steps:
+                self.COST += 1
                 self._propagate_step(step)
             self.last_steps = self.current_iteration_steps[:]
 
     def reverse_path(self):
-        # self.gui.clear()
         self.last_steps.clear()
         position = self.world.get_goal_position()
         while True:
@@ -90,7 +97,9 @@ class WavePropagation:
             if x == start_x and y == start_y:
                 break
             position = new_position
-        self.path = reversed(self.last_steps)
+        self.path = []
+        for p in reversed(self.last_steps):
+            self.path.append(p)
 
     def get_smallest_neighbour(self, position):
         x, y = position
@@ -118,6 +127,7 @@ class WavePropagation:
         x, y = position
         current_value = self.steps[x, y]
 
+        # faster option
         a, b = self.find_differenced_neighbour(2, current_value, (x, y))
         if a != -1:
             return a, b
@@ -148,8 +158,6 @@ class WavePropagation:
                 self.goal_reached = True
 
     def update_gui(self):
-        # self.gui.clear()
-        # self.gui.display_fields(self.world.get_fields(), self.world.get_width(), self.world.get_height())
         self.gui.display_start(self.world.get_start_position())
         self.gui.display_goal(self.world.get_goal_position())
         self.display_last_steps()
@@ -179,7 +187,6 @@ class WavePropagation:
         self._switch_colors(color_mode)
 
         color = int(self.RED), int(self.GREEN), int(self.BLUE)
-        print(color)
         if self.goal_reached:
             for step in self.path:
                 x, y = step
@@ -200,3 +207,10 @@ class WavePropagation:
                         line += " "
                     line += " " + str(int(self.steps[x, y]))
             print(line)
+
+    def get_iterations(self):
+        return self.iterations
+
+    def get_name(self):
+        return self.NAME
+
