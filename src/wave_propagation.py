@@ -19,7 +19,7 @@ class WavePropagation:
 
     steps = []
 
-    ENABLE_CORNER_NEIGHBOURS = False
+    ENABLE_CORNER_NEIGHBOURS = True
 
     # tmp
     RED = 255
@@ -63,6 +63,7 @@ class WavePropagation:
                     path_length += 1
                 print("WP Path found, length:", str(path_length), ", iters:", self.iterations, ", cost:", self.COST)
                 self.freeze = True
+                self.COST += 10**7
             else:
                 self.iterations += 1
 
@@ -161,7 +162,6 @@ class WavePropagation:
         self.gui.display_start(self.world.get_start_position())
         self.gui.display_goal(self.world.get_goal_position())
         self.display_last_steps()
-        # self.print_all_steps()
 
     def _switch_colors(self, mode):
         self.RED = 0
@@ -190,7 +190,7 @@ class WavePropagation:
         if self.goal_reached:
             for step in self.path:
                 x, y = step
-                self.gui.display_step((x, y), color)
+                self.gui.display_step((x, y), (250, 250, 250))
         else:
             for step in self.current_iteration_steps:
                 x, y = step

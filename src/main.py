@@ -8,9 +8,9 @@ from world import World
 
 print("PATHFINDER")
 
-width, height = 100, 100
+width, height = 400, 400
 TILE_SIZE = 6
-initial_delay = 0
+initial_delay = 4
 
 WORLD_WIDTH = int(width / TILE_SIZE)
 WORLD_HEIGHT = int(height / TILE_SIZE)
@@ -31,17 +31,35 @@ blindSearch = BlindSearch(width, height, world, gui2)
 bestFirstSearch = BestFirstSearch(width, height, world, gui3)
 
 
-def test_algorithms():
+def test_algorithms(default_algo=None):
     running = True
     started = True
+    comparing_costs = False
     time.sleep(initial_delay)
     print("RUNNING")
 
     while running:
         if started:
-            blindSearch.run()
-            wavePropagation.run()
-            bestFirstSearch.run()
+            if default_algo is None:
+                costs = []
+                costs.append(blindSearch.COST)
+                costs.append(wavePropagation.COST)
+                costs.append(bestFirstSearch.COST)
+                algos = []
+                algos.append(blindSearch)
+                algos.append(wavePropagation)
+                algos.append(bestFirstSearch)
+                for algo in algos:
+                    if comparing_costs:
+                        if algo.COST == min(costs):
+                            algo.run()
+                    else:
+                        algo.run()
+            else:
+                default_algo.run()
+            # blindSearch.run()
+            # wavePropagation.run()
+            # bestFirstSearch.run()
             # caption = str(algorithm.get_name()) + " iterations:" + str(algorithm.get_iterations())
             # pygame.display.set_caption(caption)
 
@@ -62,3 +80,6 @@ def test_algorithms():
 
 
 test_algorithms()
+test_algorithms(wavePropagation)
+test_algorithms(bestFirstSearch)
+test_algorithms(blindSearch)

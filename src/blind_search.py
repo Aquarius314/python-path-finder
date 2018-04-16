@@ -38,6 +38,7 @@ class BlindSearch:
             if self.iterations >= self.MAX_ITERATIONS or self.goal_reached:
                 print("BLIND Path found, length:", str(len(self.path)), ", iters:", self.iterations, ", cost:", self.COST)
                 self.freeze = True
+                self.COST += 10**7
             else:
                 self.iterations += 1
 

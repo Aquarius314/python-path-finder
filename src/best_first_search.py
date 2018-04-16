@@ -1,6 +1,5 @@
 from gui import Gui
 from world import World
-import pygame
 import time
 import math
 import random
@@ -26,6 +25,7 @@ class BestFirstSearch:
     to_check = []
     visited = []
     path = []
+    parents = []
 
     delay = 0.0
     head = 0, 0
@@ -47,6 +47,7 @@ class BestFirstSearch:
     def rewrite_world_to_steps_array(self):
         goal_x, goal_y = self.world.get_goal_position()
         self.steps = np.zeros(self.world.get_size())
+        self.parents = np.zeros(self.world.get_size())
         for y in range(self.world.get_width()):
             for x in range(self.world.get_height()):
                 if self.world.get_field_value(x, y) == 1:
@@ -62,6 +63,7 @@ class BestFirstSearch:
             if self.iterations >= self.MAX_ITERATIONS or self.goal_reached:
                 print("BFS Path found, length:", str(len(self.path)), ", iters:", self.iterations, ", cost:", self.COST)
                 self.freeze = True
+                self.COST += 10**7
             else:
                 self.iterations += 1
 
@@ -74,7 +76,6 @@ class BestFirstSearch:
         return True
 
     def calculate(self):
-        time.sleep(0.3)
 
         new_iteration = []
 
@@ -102,7 +103,25 @@ class BestFirstSearch:
         for node in self.to_check:
             if self.steps[node] == 0:
                 self.goal_reached = True
+                self.path = self._define_path()
+                break
 
+    def _define_path(self):
+        # self.print_all_steps(self.parents)
+        x, y = self.world.get_goal_position()
+        path = [(x, y)]
+        start_x, start_y = self.world.get_start_position()
+        while True:
+            parent = self.parents[x, y]
+            move_x, move_y = self._decode_parent(parent)
+            if move_x == 0 and move_y == 0:
+                return path
+            x += move_x
+            y += move_y
+            path.append((x, y))
+            if x == start_x and y == start_y:
+                break
+        return path
 
     def _propagate(self, node):
         x, y = node
@@ -116,6 +135,50 @@ class BestFirstSearch:
                     continue
                 if (a, b) not in self.to_check:
                     self.to_check.append((a, b))
+                    if self.parents[a, b] == 0:
+                        self.parents[a, b] = self._define_parent(a-x, b-y)
+
+    def _decode_parent(self, parent):
+        if parent == 1:
+            return 1, 1
+        if parent == 2:
+            return 0, 1
+        if parent == 3:
+            return -1, 1
+        if parent == 4:
+            return 1, 0
+        if parent == 5:
+            return -1, 0
+        if parent == 6:
+            return 1, -1
+        if parent == 7:
+            return 1, 0
+        if parent == 8:
+            return -1, -1
+        return -1, -1
+
+    def _define_parent(self, a, b):
+        if a == -1:
+            if b == -1:
+                return 1
+            if b == 0:
+                return 4
+            if b == 1:
+                return 6
+        if a == 0:
+            if b == -1:
+                return 2
+            if b == 0:
+                return 0
+            if b == 1:
+                return 7
+        if a == 1:
+            if b == -1:
+                return 3
+            if b == 0:
+                return 5
+            if b == 1:
+                return 8
 
     def _is_neighbour(self, position_a, position_b):
         ax, ay = position_a
@@ -148,7 +211,7 @@ class BestFirstSearch:
         return diagonal_dist*math.sqrt(2) + straight_dist
 
     def update_gui(self):
-        # self.gui.display_path(self.visited, (100, 100, 100))
+        self.gui.display_path(self.visited, (100, 100, 100))
         self.gui.display_path(self.to_check, (100, 0, 100))
         self.gui.display_path(self.path, (0, 200, 200))
         return
@@ -159,15 +222,34 @@ class BestFirstSearch:
     def get_name(self):
         return self.NAME
 
-    def print_all_steps(self):
+    def print_all_steps(self, array):
         print("--- steps ---")
-        for y in range(len(self.steps)):
+        for y in range(len(array)):
             line = ""
-            for x in range(len(self.steps[0])):
-                if self.steps[x, y] == -1:
+            for x in range(len(array[0])):
+                if array[x, y] == -1:
                     line += "  *"
                 else:
-                    if 10 > self.steps[x, y] > -2:
-                        line += " "
-                    line += " " + str(int(self.steps[x, y]))
+                    # if 10 > array[x, y] > -2:
+                    #     line += " "
+                    line += "|"
+                    if int(array[x, y]) == 0:
+                        line += "  "
+                    if int(array[x, y]) == 1:
+                        line += "RD"
+                    if int(array[x, y]) == 2:
+                        line += "DD"
+                    if int(array[x, y]) == 3:
+                       line += "LD"
+                    if int(array[x, y]) == 4:
+                        line += "RR"
+                    if int(array[x, y]) == 5:
+                        line += "LL"
+                    if int(array[x, y]) == 6:
+                        line += "RU"
+                    if int(array[x, y]) == 7:
+                        line += "UU"
+                    if int(array[x, y]) == 8:
+                        line += "LU"
+
             print(line)

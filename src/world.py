@@ -5,13 +5,17 @@ from wall import Wall
 
 class World:
 
-    RANDOM_OBSTACLES = False
+    RANDOM_OBSTACLES = True
     RANDOM_WALLS = True
     UNREACHABLE = False  # it will be impossible for sure to find an exit!
 
-    OBSTACLES_PERCENTAGE = 15
-    WALLS = 200
+    OBSTACLES_PERCENTAGE = 40
+    WALLS = 1500
     walls = []
+
+    # optimization stuff
+    display_fields_once = True
+    clearing = True
 
     def __init__(self, width, height):
         self.width = width
@@ -25,17 +29,19 @@ class World:
         self._set_start_position()
 
     def _generate_maze(self):
-        # for i in range(self.WALLS):
-        #     self._add_random_wall(self._fields)
-        self._add_wall(self._fields, 70, 70, 20, 2)
-        self._add_wall(self._fields, 20, 20, 2, 90)
-        self._add_wall(self._fields, 40, 0, 2, 90)
-        self._add_wall(self._fields, 60, 20, 2, 90)
-        self._add_wall(self._fields, 10, 30, 25, 2)
-        self._add_wall(self._fields, 30, 50, 25, 2)
-        self._add_wall(self._fields, 50, 70, 25, 2)
-        self._add_wall(self._fields, 3, 7, 12, 2)
-        self._add_wall(self._fields, 3, 7, 2, 4)
+        self._add_wall(self._fields, int(self.width/3), int(self.height/3), int(self.width/3), 2)
+        self._add_wall(self._fields, 2*int(self.width/3), int(self.height/3), 2, int(self.height/3))
+        # self._add_wall(self._fields, 70, 70, 20, 2)
+        # self._add_wall(self._fields, 20, 20, 2, 90)
+        # self._add_wall(self._fields, 40, 0, 2, 90)
+        # self._add_wall(self._fields, 60, 20, 2, 90)
+        # self._add_wall(self._fields, 10, 30, 25, 2)
+        # self._add_wall(self._fields, 30, 50, 25, 2)
+        # self._add_wall(self._fields, 50, 70, 25, 2)
+        # self._add_wall(self._fields, 3, 7, 12, 2)
+        # self._add_wall(self._fields, 3, 7, 2, 4)
+
+        # self._add_wall(self._fields, int(self.width/2-100), int(self.height/2-100), 200, 200)
 
     def _add_random_wall(self, array):
         length = random.randint(10, 20)
@@ -84,6 +90,7 @@ class World:
             for y in range(self.height):
                 if random.randint(1, 100) <= self.OBSTACLES_PERCENTAGE:
                     self._fields[x, y] = 1
+                    self.walls.append(Wall(x, y, 1, 1))
 
     def get_goal_position(self):
         return self.goal_x, self.goal_y
@@ -107,7 +114,12 @@ class World:
         return self.width, self.height
 
     def display(self, gui):
-        gui.clear()
-        gui.display_fields(self.walls, self.get_width(), self.get_height())
+        if self.clearing:
+            gui.clear()
+            gui.display_fields(self.walls, self.get_width(), self.get_height())
+        else:
+            if self.display_fields_once:
+                gui.display_fields(self.walls, self.get_width(), self.get_height())
+                self.display_fields_once = False
         gui.display_start(self.get_start_position())
         gui.display_goal(self.get_goal_position())
